@@ -17,26 +17,28 @@ def Trades():
     pairs = client.get_exchange_info()
 
     for pair in pairs['symbols']:
+        def gettrades():
+            orders = client.get_all_orders(symbol=pair['symbol'], limit=100)
         
-        orders = client.get_all_orders(symbol=pair['symbol'], limit=100)
-    
-       
-        if orders and orders[0]['status'] == "FILLED":
-            for trade in orders:
-                Date = datetime.fromtimestamp(int(orders[0]['time'])/1000)
+            if orders and orders[0]['status'] == "FILLED":
+                for trade in orders:
+                    Date = datetime.fromtimestamp(int(orders[0]['time'])/1000)
 
-                #Buy orders
-                if trade['side'] == "BUY":
-                    print("Trade,",trade['origQty'],",",pair['baseAsset'],",,",trade['cummulativeQuoteQty'],",",pair['quoteAsset'],",,,,,Binance,",Date,",",trade['orderId'],",")
-                
-                #Sell orders
-                else:   
-                    print("Trade,",trade['cummulativeQuoteQty'],",",pair['quoteAsset'],",,",trade['origQty'],",",pair['baseAsset'],",,,,,Binance,",Date,",",trade['orderId'],",")
+                    #Buy orders
+                    if trade['side'] == "BUY":
+                        print("Trade,",trade['origQty'],",",pair['baseAsset'],",,",trade['cummulativeQuoteQty'],",",pair['quoteAsset'],",,,,,Binance,",Date,",",trade['orderId'],",")
+                    
+                    #Sell orders
+                    else:   
+                        print("Trade,",trade['cummulativeQuoteQty'],",",pair['quoteAsset'],",,",trade['origQty'],",",pair['baseAsset'],",,,,,Binance,",Date,",",trade['orderId'],",")
+        
+        #Binace API ratelimit workaround
+        try: 
+            gettrades()
 
-        #ratelimit
-        time.sleep(0.2)       
-
-
+        except:
+            time.sleep(30)
+            gettrades()
 
 def Deposits():
     #Fetch deposit history
