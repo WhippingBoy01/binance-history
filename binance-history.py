@@ -16,22 +16,26 @@ client = Client(api_key, api_secret)
 def Trades():
     pairs = client.get_exchange_info()
 
-    for i in pairs['symbols']:
+    for pair in pairs['symbols']:
         
-        orders = client.get_all_orders(symbol=i['symbol'], limit=100)
-
+        orders = client.get_all_orders(symbol=pair['symbol'], limit=100)
+    
+       
         if orders and orders[0]['status'] == "FILLED":
-            Date = datetime.fromtimestamp(int(orders[0]['time'])/1000)
-            #Buy orders
-            if orders[0]['side'] == "BUY":
-                print("Trade,",orders[0]['origQty'],",",i['baseAsset'],",,",orders[0]['cummulativeQuoteQty'],",",i['quoteAsset'],",,,,,Binance,",Date,",",orders[0]['orderId'],",")
-            
-            #Sell orders
-            else:   
-                print("Trade,",orders[0]['cummulativeQuoteQty'],",",i['quoteAsset'],",,",orders[0]['origQty'],",",i['baseAsset'],",,,,,Binance,",Date,",",orders[0]['orderId'],",")
+            for trade in orders:
+                Date = datetime.fromtimestamp(int(orders[0]['time'])/1000)
 
-            #ratelimit
-        time.sleep(0.2)
+                #Buy orders
+                if trade['side'] == "BUY":
+                    print("Trade,",trade['origQty'],",",pair['baseAsset'],",,",trade['cummulativeQuoteQty'],",",pair['quoteAsset'],",,,,,Binance,",Date,",",trade['orderId'],",")
+                
+                #Sell orders
+                else:   
+                    print("Trade,",trade['cummulativeQuoteQty'],",",pair['quoteAsset'],",,",trade['origQty'],",",pair['baseAsset'],",,,,,Binance,",Date,",",trade['orderId'],",")
+
+        #ratelimit
+        time.sleep(0.2)       
+
 
 
 def Deposits():
